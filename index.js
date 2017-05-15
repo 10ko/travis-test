@@ -57,10 +57,11 @@ const main = () => {
     dependentRepoBranch = process.argv[3];
   }
 
-  console.log('Starting to build dependent project: ' + dependentRepo + 'on branch ' + dependentRepoBranch);
+  console.log('Starting to build dependent project: ' + dependentRepo + ' on branch ' + dependentRepoBranch);
 
   request('GET', `repo/${dependentRepo}`, travisAccessToken)
   .then((res) => {
+    console.log(res);
     if (!res.id) {
       console.log('Dependent repository not found! Exiting');
       process.exit(1);
