@@ -5,7 +5,7 @@ node_js:
 install:
 - npm prune
 - npm install
-- node index.js 10ko/test-build
+- npm run start 10ko/test-build
 cache:
   directories:
     - node_modules

@@ -57,6 +57,8 @@ const main = () => {
     dependentRepoBranch = process.argv[3];
   }
 
+  console.log('Starting to build dependent project: ' + dependentRepo + 'on branch ' + dependentRepoBranch);
+
   request('GET', `repo/${dependentRepo}`, travisAccessToken)
   .then((res) => {
     if (!res.id) {
@@ -64,7 +66,7 @@ const main = () => {
       process.exit(1);
     }
   })
-  // .then(() => request('POST', `repo/${dependentRepo}/requests`, travisAccessToken, { branch: dependentRepoBranch}))
+  .then(() => request('POST', `repo/${dependentRepo}/requests`, travisAccessToken, { branch: dependentRepoBranch}))
   .then(() => checkIfBuildIsCreated())
   .then((build) => checkIfBuildIsSuccessfull(build))
   .then(() => {
