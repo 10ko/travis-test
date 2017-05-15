@@ -1,0 +1,11 @@
+sudo: required
+language: node_js
+node_js:
+  - "7"
+install:
+- npm prune
+- npm install
+- npm run lint
+cache:
+  directories:
+    - node_modules
