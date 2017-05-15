@@ -20,13 +20,26 @@ const request = (method, path, auth, data) => {
   });
 }
 
-function checkIfBuildIsCreated(res) {
+function checkIfBuildIsCreated() {
   return new Promise(function (resolve, reject) {
     (function waitForNewBuildToBeCreated(){
         request('GET', `repo/${dependentRepo}/builds`, travisAccessToken)
         .then((res) => {
-          if (res.builds[0].state === 'created') return resolve();
+          if (res.builds[0].state === 'created') return resolve(res.builds[0]);
           setTimeout(waitForNewBuildToBeCreated, 5000);
+        });
+    })();
+  });
+}
+
+function checkIfBuildIsSuccessfull(build) {
+  return new Promise(function (resolve, reject) {
+    (function waitForBuildToBeEnd(){
+        request('GET', `build/${build.id}`, travisAccessToken)
+        .then((res) => {
+          if (res.state === 'passed') return resolve(res);
+          if (res.state === 'failed') reject('The dependent build failed. Exiting');
+          setTimeout(waitForBuildToBeEnd, 5000);
         });
     })();
   });
@@ -51,10 +64,16 @@ const main = () => {
       process.exit(1);
     }
   })
-  .then( () => request('POST', `repo/${dependentRepo}/requests`, travisAccessToken, { branch: dependentRepoBranch}) )
-  .then( (res) => waitForBuild(res))
-  .then((res) => {
-    console.log(res.builds[0]);
+  // .then(() => request('POST', `repo/${dependentRepo}/requests`, travisAccessToken, { branch: dependentRepoBranch}))
+  .then(() => checkIfBuildIsCreated())
+  .then((build) => checkIfBuildIsSuccessfull(build))
+  .then(() => {
+    console.log('Your dependent project built successfully! Continuing with the build');
+    process.exit(0);
+  })
+  .catch((error) => {
+    console.error(error);
+    process.exit(1);
   });
 }
 

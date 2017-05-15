@@ -5,7 +5,7 @@ node_js:
 install:
 - npm prune
 - npm install
-- npm run lint
+- node index.js
 cache:
   directories:
     - node_modules
